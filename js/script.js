@@ -730,8 +730,8 @@ function initVoiceFeature() {
     const introductionText = `
         Hello! I'm Salman Farooqi, a Deal Desk and Revenue Operations Analyst based in Bangalore, India.
         
-        I have an M B A in International Business and over 3 years of experience at I B M, 
-        where I support global sales, pricing approvals, and quote-to-cash execution.
+        I have an M B A in International Business and over 7 years of professional experience,
+        including 3 years at I B M, where I support global sales, pricing approvals, and quote-to-cash execution.
         
         My expertise includes deal desk operations, revenue operations, accounts receivable management, 
         and cash application. I've successfully closed over 200 thousand dollars in receivable gaps 
@@ -766,15 +766,38 @@ function initVoiceFeature() {
         currentUtterance.pitch = 1.0;
         currentUtterance.volume = 1.0;
         
-        // Try to use a good quality voice
+        // Try to use a male voice
         const voices = speechSynthesis.getVoices();
-        const preferredVoice = voices.find(voice => 
-            voice.lang.startsWith('en') && 
+        
+        // Priority 1: Look for male voices specifically
+        const maleVoice = voices.find(voice =>
+            voice.lang.startsWith('en') &&
+            (voice.name.toLowerCase().includes('male') ||
+             voice.name.includes('David') ||
+             voice.name.includes('Mark') ||
+             voice.name.includes('James') ||
+             voice.name.includes('Guy'))
+        );
+        
+        // Priority 2: Look for Google/Microsoft male voices
+        const qualityMaleVoice = voices.find(voice =>
+            voice.lang.startsWith('en') &&
+            !voice.name.toLowerCase().includes('female') &&
             (voice.name.includes('Google') || voice.name.includes('Microsoft'))
-        ) || voices.find(voice => voice.lang.startsWith('en'));
+        );
+        
+        // Priority 3: Any English voice that's not explicitly female
+        const anyMaleVoice = voices.find(voice =>
+            voice.lang.startsWith('en') &&
+            !voice.name.toLowerCase().includes('female') &&
+            !voice.name.toLowerCase().includes('woman')
+        );
+        
+        const preferredVoice = maleVoice || qualityMaleVoice || anyMaleVoice || voices.find(voice => voice.lang.startsWith('en'));
         
         if (preferredVoice) {
             currentUtterance.voice = preferredVoice;
+            console.log('Using voice:', preferredVoice.name);
         }
         
         // Event handlers
